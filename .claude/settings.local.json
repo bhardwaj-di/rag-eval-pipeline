@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(conda env:*)",
+      "Bash(conda config:*)",
+      "Bash(mkdir -p ingestion rag api eval monitoring data/raw_filings)",
+      "Bash(touch ingestion/fetch_corpus.py ingestion/chunk_and_embed.py ingestion/load_qdrant.py rag/retriever.py rag/generator.py rag/pipeline.py api/main.py eval/generate_testset.py eval/run_ragas.py eval/run_deepeval.py eval/llm_judge.py monitoring/evidently_report.py docker-compose.yml Dockerfile .env .gitignore)",
+      "Bash(printf \".env\\\\nvenv/\\\\n__pycache__/\\\\n*.pyc\\\\ndata/\")"
+    ]
+  }
+}
