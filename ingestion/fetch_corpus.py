@@ -4,7 +4,8 @@ from pathlib import Path
 TICKERS = ["AAPL", "MSI", "GOOGL", "NVDA", "AMZN", "META", "TSLA", "NFLX", "JPM", "JNJ"]
 FILING_TYPE = "10-K"
 NUM_FILINGS = 2
-OUTPUT_DIR = Path("data/raw_filings")
+BASE_DIR = Path(__file__).parent.parent
+OUTPUT_DIR = BASE_DIR / "data"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def fetch_filings():
