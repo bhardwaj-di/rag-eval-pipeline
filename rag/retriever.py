@@ -1,5 +1,5 @@
 from qdrant_client import QdrantClient
-from langchain_ollama import OllamaEmbeddings
+from nomic import embed
 from dotenv import load_dotenv
 import os
 from qdrant_client.models import Filter, FieldCondition, MatchValue
@@ -8,19 +8,21 @@ load_dotenv()
 
 COLLECTION_NAME = "sec_filings"
 
-client = QdrantClient(
+qdrant = QdrantClient(
     url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY"),
     timeout=30
 )
 
-embeddings = OllamaEmbeddings(
-    model=os.getenv("OLLAMA_EMBED_MODEL"),
-    base_url=os.getenv("OLLAMA_BASE_URL")
-)
+os.environ["NOMIC_API_KEY"] = os.getenv("NOMIC_API_KEY")
 
 def retrieve(query, top_k=5, ticker=None):
-    query_embedding = embeddings.embed_query(query)
+    response = embed.text(
+        texts=["search_query: " + query],
+        model="nomic-embed-text-v1",
+        task_type="search_query"
+    )
+    query_embedding = response["embeddings"][0]
 
     if ticker:
         filter = Filter(
@@ -34,12 +36,19 @@ def retrieve(query, top_k=5, ticker=None):
     else:
         filter = None
 
-    results = client.search(
+    results = qdrant.search(
         collection_name=COLLECTION_NAME,
         query_vector=query_embedding,
         limit=top_k,
         query_filter=filter
     )
 
-    return [{"text": r.payload["text"], "ticker": r.payload["ticker"], "source_file": r.payload["source_file"], "score": r.score} for r in results]
-
+    return [
+        {
+            "text": r.payload["text"],
+            "ticker": r.payload["ticker"],
+            "source_file": r.payload["source_file"],
+            "score": r.score
+        }
+        for r in results
+    ]
