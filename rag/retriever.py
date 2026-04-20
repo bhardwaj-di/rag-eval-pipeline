@@ -1,5 +1,6 @@
 from qdrant_client import QdrantClient
 from nomic import embed
+import nomic
 from dotenv import load_dotenv
 import os
 from qdrant_client.models import Filter, FieldCondition, MatchValue
@@ -16,7 +17,7 @@ qdrant = QdrantClient(
 
 nomic_key = os.getenv("NOMIC_API_KEY")
 if nomic_key:
-    os.environ["NOMIC_API_KEY"] = nomic_key
+    nomic.login(token=nomic_key)
 
 def retrieve(query, top_k=8, ticker=None):
     response = embed.text(
