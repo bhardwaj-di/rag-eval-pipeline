@@ -14,7 +14,9 @@ qdrant = QdrantClient(
     timeout=30
 )
 
-os.environ["NOMIC_API_KEY"] = os.getenv("NOMIC_API_KEY")
+nomic_key = os.getenv("NOMIC_API_KEY")
+if nomic_key:
+    os.environ["NOMIC_API_KEY"] = nomic_key
 
 def retrieve(query, top_k=8, ticker=None):
     response = embed.text(
