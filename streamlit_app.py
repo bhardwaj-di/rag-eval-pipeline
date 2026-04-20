@@ -4,6 +4,10 @@ import os
 
 sys.path.append(os.path.dirname(__file__))
 
+for _key in ["QDRANT_URL", "QDRANT_API_KEY", "GROQ_API_KEY", "NOMIC_API_KEY"]:
+    if _key in st.secrets:
+        os.environ[_key] = st.secrets[_key]
+
 from rag.pipeline import answer_question
 
 st.set_page_config(
