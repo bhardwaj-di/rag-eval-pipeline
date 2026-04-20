@@ -4,7 +4,7 @@ import time
 import argparse
 from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_ollama import OllamaEmbeddings
+from nomic import embed
 from dotenv import load_dotenv
 import os
 
@@ -14,10 +14,8 @@ BASE_DIR = Path(__file__).parent.parent
 RAW_DIR = BASE_DIR / "data" / "sec-edgar-filings"
 CHUNKS_FILE = BASE_DIR / "data" / "chunks.json"
 
-embeddings = OllamaEmbeddings(
-    model=os.getenv("OLLAMA_EMBED_MODEL"),
-    base_url=os.getenv("OLLAMA_BASE_URL")
-)
+NOMIC_EMBED_MODEL = "nomic-embed-text-v1"
+EMBED_BATCH_SIZE = 50
 
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=800,
@@ -25,20 +23,61 @@ splitter = RecursiveCharacterTextSplitter(
     separators=["\n\n", "\n", ".", " "]
 )
 
-def extract_text(filepath: Path) -> str:
-    return filepath.read_text(encoding="utf-8", errors="ignore")
+def embed_with_retry(chunks, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            prefixed = ["search_document: " + c for c in chunks]
+            response = embed.text(
+                texts=prefixed,
+                model=NOMIC_EMBED_MODEL,
+                task_type="search_document"
+            )
+            return response["embeddings"]
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"    Retry {attempt + 1}/{max_retries} after error: {e}")
+                time.sleep(5)
+            else:
+                raise
+
+def extract_narrative(filepath: Path) -> str:
+    text = filepath.read_text(encoding="utf-8", errors="ignore")
+
+    documents = re.findall(r"<DOCUMENT>(.*?)</DOCUMENT>", text, flags=re.DOTALL)
+
+    narrative_parts = []
+    for doc in documents:
+        doc_type = re.search(r"<TYPE>([^\n]+)", doc)
+        doc_type = doc_type.group(1).strip() if doc_type else ""
+
+        if doc_type in ("10-K", "10-K/A"):
+            clean = re.sub(r"<[^>]+>", " ", doc)
+            clean = re.sub(r"&#\d+;", " ", clean)
+            clean = re.sub(r"&[a-z]+;", " ", clean)
+
+            # Skip XBRL header — jump to where narrative starts
+            match = re.search(r'\bPart\s+I\b(?!\s*I)', clean)
+            if not match:
+                match = re.search(r'\bItem\s+1[\.\s]', clean)
+            if match:
+                clean = clean[match.start():]
+
+            narrative_parts.append(clean)
+
+    if not narrative_parts:
+        return text
+
+    return "\n\n".join(narrative_parts)
 
 def clean_text(text: str) -> str:
-    # Remove SGML/HTML tags
-    text = re.sub(r"<[^>]+>", " ", text)
-    # Remove base64 encoded blobs (long strings of alphanumeric chars with no spaces)
+    # Remove base64 encoded blobs
     text = re.sub(r"[A-Za-z0-9+/]{100,}", " ", text)
-    # Remove SEC EDGAR header metadata block
-    text = re.sub(r"<SEC-HEADER>.*?</SEC-HEADER>", " ", text, flags=re.DOTALL)
-    # Remove XBRL/XML blocks
-    text = re.sub(r"<XBRL>.*?</XBRL>", " ", text, flags=re.DOTALL)
-    # Remove lines that are just dashes, underscores or special chars (table borders)
+    # Remove XBRL inline tags
+    text = re.sub(r"<ix:[^>]+>", " ", text, flags=re.IGNORECASE)
+    # Remove lines that are just dashes, underscores or special chars
     text = re.sub(r"^[\-_=*]{3,}$", "", text, flags=re.MULTILINE)
+    # Remove lines that look like XBRL data (no spaces, colon-separated)
+    text = re.sub(r"^[a-z\-]+:[A-Za-z]+\s+\d.*$", "", text, flags=re.MULTILINE)
     # Normalize whitespace
     text = re.sub(r"\n{3,}", "\n\n", text)
     text = re.sub(r" {2,}", " ", text)
@@ -63,15 +102,17 @@ def process_all_filings(cpu_only=False):
         print(f"Processing {ticker} — {filepath.name}")
 
         try:
-            text = extract_text(filepath)
-            raw_chunks = splitter.split_text(text)
+            text = extract_narrative(filepath)
             text = clean_text(text)
             chunks = splitter.split_text(text)
-            print(f"  Chunks before cleaning: {len(raw_chunks)} → after: {len(chunks)}")
+            print(f"  Chunks after extraction: {len(chunks)}")
 
             print(f"  Embedding {len(chunks)} chunks...")
             file_start = time.time()
-            vectors = embeddings.embed_documents(chunks)
+            vectors = []
+            for i in range(0, len(chunks), EMBED_BATCH_SIZE):
+                batch = chunks[i:i + EMBED_BATCH_SIZE]
+                vectors.extend(embed_with_retry(batch))
             file_elapsed = time.time() - file_start
 
             for i, (chunk, vector) in enumerate(zip(chunks, vectors)):

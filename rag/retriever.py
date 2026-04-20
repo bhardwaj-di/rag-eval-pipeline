@@ -16,7 +16,7 @@ qdrant = QdrantClient(
 
 os.environ["NOMIC_API_KEY"] = os.getenv("NOMIC_API_KEY")
 
-def retrieve(query, top_k=5, ticker=None):
+def retrieve(query, top_k=8, ticker=None):
     response = embed.text(
         texts=["search_query: " + query],
         model="nomic-embed-text-v1",

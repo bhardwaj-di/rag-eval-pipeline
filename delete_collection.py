@@ -1,0 +1,8 @@
+from qdrant_client import QdrantClient
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+client = QdrantClient(url=os.getenv("QDRANT_URL"), api_key=os.getenv("QDRANT_API_KEY"))
+client.delete_collection("sec_filings")
+print("Collection deleted.")
