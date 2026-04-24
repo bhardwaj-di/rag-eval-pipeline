@@ -18,20 +18,51 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    .stApp {
+        background: linear-gradient(135deg, #0f0c29, #1a1a4e, #24243e);
+        background-attachment: fixed;
+    }
     .main { padding-top: 1rem; }
     .stChatMessage { border-radius: 12px; margin-bottom: 0.5rem; }
     .source-badge {
         display: inline-block;
-        background: #f0f2f6;
+        background: rgba(255,255,255,0.1);
         border-radius: 8px;
         padding: 2px 10px;
         font-size: 12px;
         font-weight: 600;
         margin-right: 6px;
-        color: #1f77b4;
+        color: #7eb8f7;
     }
-    .score-text { color: #888; font-size: 12px; }
+    .score-text { color: #aaa; font-size: 12px; }
+    .welcome-banner {
+        text-align: center;
+        padding: 2rem 1rem 1.2rem 1rem;
+        background: linear-gradient(90deg, rgba(30,80,160,0.35), rgba(90,30,120,0.35));
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        margin-bottom: 1.5rem;
+    }
+    .welcome-banner h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0 0 0.3rem 0;
+        letter-spacing: 0.5px;
+    }
+    .welcome-banner p {
+        color: #a0b8d8;
+        font-size: 0.95rem;
+        margin: 0;
+    }
 </style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="welcome-banner">
+    <h1>📊 Welcome to Your Finance 10-K Filings Assistant</h1>
+    <p>Explore annual SEC filings for AAPL, GOOGL, META, MSI & NVDA &nbsp;·&nbsp; Fiscal Years 2024–2025</p>
+</div>
 """, unsafe_allow_html=True)
 
 with st.sidebar:
@@ -94,8 +125,6 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if not st.session_state.messages:
-    st.markdown("## 📈 SEC 10-K Filings Assistant")
-    st.markdown("Ask questions about annual filings from **AAPL, GOOGL, META, MSI,** and **NVDA**.")
     st.info("💡 Select a company from the sidebar or ask about all companies at once.")
 
 for message in st.session_state.messages:
