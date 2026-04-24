@@ -11,21 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: 10k-finance-rag
     steps:
-      - name: Check Qdrant collections endpoint
+      - name: Check Qdrant health endpoint
         env:
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
-          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
         run: |
           CLEAN_URL="${QDRANT_URL%/}"
-          echo "Pinging Qdrant at $CLEAN_URL/collections ..."
-          response=$(curl -s --max-time 30 \
-            -w "\n%{http_code}" \
-            -H "api-key: $QDRANT_API_KEY" \
-            "$CLEAN_URL/collections")
-          http_code=$(echo "$response" | tail -1)
-          body=$(echo "$response" | head -1)
+          echo "Pinging Qdrant at $CLEAN_URL/healthz ..."
+          http_code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$CLEAN_URL/healthz")
           echo "HTTP status: $http_code"
-          echo "Response: $body"
           [ "$http_code" = "200" ] && echo "Qdrant is alive." || (echo "Qdrant ping failed." && exit 1)
 
   ping-streamlit:
