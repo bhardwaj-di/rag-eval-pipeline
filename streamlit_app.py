@@ -47,19 +47,33 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("**💡 Sample Questions**")
-    sample_questions = [
-        "Select a sample question...",
-        "What are NVIDIA's main business segments?",
-        "What risks does NVIDIA mention in their filing?",
-        "What is NVIDIA's growth strategy?",
-        "What does Motorola Solutions do?",
-        "How does Apple describe its competition?",
-        "What are Meta's plans for AI investment?",
-        "What products does Apple sell?",
-        "What regulatory risks does Meta face?",
-        "How does Alphabet describe its cloud business?",
-        "What are the key risk factors for Motorola Solutions?",
-    ]
+    questions_by_ticker = {
+        "NVDA": [
+            "What are NVIDIA's main business segments?",
+            "What risks does NVIDIA mention in their filing?",
+            "What is NVIDIA's growth strategy?",
+        ],
+        "AAPL": [
+            "How does Apple describe its competition?",
+            "What products does Apple sell?",
+        ],
+        "META": [
+            "What are Meta's plans for AI investment?",
+            "What regulatory risks does Meta face?",
+        ],
+        "GOOGL": [
+            "How does Alphabet describe its cloud business?",
+        ],
+        "MSI": [
+            "What does Motorola Solutions do?",
+            "What are the key risk factors for Motorola Solutions?",
+        ],
+    }
+    if ticker:
+        filtered_questions = questions_by_ticker.get(ticker, [])
+    else:
+        filtered_questions = [q for qs in questions_by_ticker.values() for q in qs]
+    sample_questions = ["Select a sample question..."] + filtered_questions
     selected_q = st.selectbox("", sample_questions, label_visibility="collapsed")
     if st.button("Ask this question", use_container_width=True) and selected_q != "Select a sample question...":
         st.session_state["pending_question"] = selected_q
