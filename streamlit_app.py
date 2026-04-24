@@ -37,31 +37,51 @@ st.markdown("""
         border-bottom: 1px solid rgba(255,255,255,0.06) !important;
     }
 
-    /* Chat input container */
-    [data-testid="stBottom"], [data-testid="stBottom"] > div {
-        background: #0f0c29 !important;
+    /* Chat input container — force dark all the way down */
+    [data-testid="stBottom"],
+    [data-testid="stBottom"] > div,
+    [data-testid="stBottom"] > div > div {
+        background: #0d0b28 !important;
         border-top: 1px solid rgba(255,255,255,0.08) !important;
     }
-    [data-testid="stChatInput"] {
-        background: rgba(255,255,255,0.07) !important;
-        border: 1px solid rgba(255,255,255,0.15) !important;
+    [data-testid="stChatInput"],
+    [data-testid="stChatInput"] > div {
+        background: #1e1b45 !important;
+        border: 1px solid rgba(255,255,255,0.18) !important;
         border-radius: 12px !important;
     }
     [data-testid="stChatInput"] textarea {
-        background: transparent !important;
+        background: #1e1b45 !important;
         color: #e8eaf0 !important;
         caret-color: #e8eaf0 !important;
+        font-size: 0.95rem !important;
     }
     [data-testid="stChatInput"] textarea::placeholder {
-        color: #64748b !important;
+        color: #6b7a99 !important;
+        opacity: 1 !important;
     }
 
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background: rgba(15, 12, 41, 0.95) !important;
-    }
+    /* Sidebar — dark background + readable text */
+    [data-testid="stSidebar"],
+    [data-testid="stSidebar"] > div { background: #0d0b28 !important; }
     [data-testid="stSidebar"] * { color: #cbd5e1 !important; }
-    [data-testid="stSidebar"] .stSelectbox label { color: #94a3b8 !important; }
+
+    /* Sidebar selectbox inputs */
+    [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] > div {
+        background: #1e1b45 !important;
+        border-color: rgba(255,255,255,0.15) !important;
+        color: #e8eaf0 !important;
+    }
+    [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] span {
+        color: #e8eaf0 !important;
+    }
+
+    /* Sidebar button */
+    [data-testid="stSidebar"] .stButton button {
+        background: #1e1b45 !important;
+        color: #e8eaf0 !important;
+        border: 1px solid rgba(255,255,255,0.15) !important;
+    }
 
     /* Info box */
     .stAlert { background: rgba(30,80,160,0.25) !important; border: 1px solid rgba(100,150,255,0.2) !important; }
