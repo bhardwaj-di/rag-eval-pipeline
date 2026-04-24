@@ -16,11 +16,17 @@ jobs:
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
         run: |
-          echo "Pinging Qdrant at $QDRANT_URL ..."
-          response=$(curl -sf --max-time 30 \
+          CLEAN_URL="${QDRANT_URL%/}"
+          echo "Pinging Qdrant at $CLEAN_URL/collections ..."
+          response=$(curl -s --max-time 30 \
+            -w "\n%{http_code}" \
             -H "api-key: $QDRANT_API_KEY" \
-            "$QDRANT_URL/collections")
-          echo "$response" | grep -q "result" && echo "Qdrant is alive." || (echo "Qdrant ping failed." && exit 1)
+            "$CLEAN_URL/collections")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -1)
+          echo "HTTP status: $http_code"
+          echo "Response: $body"
+          [ "$http_code" = "200" ] && echo "Qdrant is alive." || (echo "Qdrant ping failed." && exit 1)
 
   ping-streamlit:
     name: Ping Streamlit App
