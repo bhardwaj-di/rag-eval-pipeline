@@ -1,0 +1,33 @@
+name: Keepalive
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # runs once daily at 9:00 AM UTC
+  workflow_dispatch:         # allows manual trigger from GitHub UI
+
+jobs:
+  ping-qdrant:
+    name: Ping Qdrant Cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Qdrant collections endpoint
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+        run: |
+          echo "Pinging Qdrant at $QDRANT_URL ..."
+          response=$(curl -sf --max-time 30 \
+            -H "api-key: $QDRANT_API_KEY" \
+            "$QDRANT_URL/collections")
+          echo "$response" | grep -q "result" && echo "Qdrant is alive." || (echo "Qdrant ping failed." && exit 1)
+
+  ping-streamlit:
+    name: Ping Streamlit App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake up Streamlit app
+        run: |
+          echo "Pinging Streamlit app..."
+          curl -sf --max-time 60 "${{ secrets.STREAMLIT_URL }}" -o /dev/null \
+            && echo "Streamlit is alive." \
+            || echo "Streamlit ping returned non-200 (may still be waking up, not failing the job)."
