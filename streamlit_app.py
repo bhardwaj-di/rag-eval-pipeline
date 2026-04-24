@@ -51,7 +51,7 @@ with st.sidebar:
         "NVDA": [
             "What are NVIDIA's main business segments?",
             "What risks does NVIDIA mention in their filing?",
-            "What is NVIDIA's growth strategy?",
+            "What drove NVIDIA's revenue growth in fiscal year 2025?",
         ],
         "AAPL": [
             "How does Apple describe its competition?",
