@@ -31,12 +31,29 @@ st.markdown("""
     .stChatMessage { border-radius: 12px; margin-bottom: 0.5rem; }
     [data-testid="stChatMessageContent"] p { color: #e8eaf0 !important; }
 
-    /* Chat input */
-    [data-testid="stChatInput"] textarea {
+    /* Top header bar */
+    [data-testid="stHeader"] {
+        background: #0f0c29 !important;
+        border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    }
+
+    /* Chat input container */
+    [data-testid="stBottom"], [data-testid="stBottom"] > div {
+        background: #0f0c29 !important;
+        border-top: 1px solid rgba(255,255,255,0.08) !important;
+    }
+    [data-testid="stChatInput"] {
         background: rgba(255,255,255,0.07) !important;
-        color: #e8eaf0 !important;
         border: 1px solid rgba(255,255,255,0.15) !important;
         border-radius: 12px !important;
+    }
+    [data-testid="stChatInput"] textarea {
+        background: transparent !important;
+        color: #e8eaf0 !important;
+        caret-color: #e8eaf0 !important;
+    }
+    [data-testid="stChatInput"] textarea::placeholder {
+        color: #64748b !important;
     }
 
     /* Sidebar */
