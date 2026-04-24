@@ -22,8 +22,34 @@ st.markdown("""
         background: linear-gradient(135deg, #0f0c29, #1a1a4e, #24243e);
         background-attachment: fixed;
     }
-    .main { padding-top: 1rem; }
+
+    /* Main text readable on dark bg */
+    .stApp, .stApp p, .stApp li, .stApp label,
+    .stMarkdown, .stMarkdown p { color: #e8eaf0 !important; }
+
+    /* Chat messages */
     .stChatMessage { border-radius: 12px; margin-bottom: 0.5rem; }
+    [data-testid="stChatMessageContent"] p { color: #e8eaf0 !important; }
+
+    /* Chat input */
+    [data-testid="stChatInput"] textarea {
+        background: rgba(255,255,255,0.07) !important;
+        color: #e8eaf0 !important;
+        border: 1px solid rgba(255,255,255,0.15) !important;
+        border-radius: 12px !important;
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background: rgba(15, 12, 41, 0.95) !important;
+    }
+    [data-testid="stSidebar"] * { color: #cbd5e1 !important; }
+    [data-testid="stSidebar"] .stSelectbox label { color: #94a3b8 !important; }
+
+    /* Info box */
+    .stAlert { background: rgba(30,80,160,0.25) !important; border: 1px solid rgba(100,150,255,0.2) !important; }
+    .stAlert p { color: #93c5fd !important; }
+
     .source-badge {
         display: inline-block;
         background: rgba(255,255,255,0.1);
@@ -35,6 +61,7 @@ st.markdown("""
         color: #7eb8f7;
     }
     .score-text { color: #aaa; font-size: 12px; }
+
     .welcome-banner {
         text-align: center;
         padding: 2rem 1rem 1.2rem 1rem;
