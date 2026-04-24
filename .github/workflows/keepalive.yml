@@ -9,6 +9,7 @@ jobs:
   ping-qdrant:
     name: Ping Qdrant Cluster
     runs-on: ubuntu-latest
+    environment: 10k-finance-rag
     steps:
       - name: Check Qdrant collections endpoint
         env:
@@ -24,6 +25,7 @@ jobs:
   ping-streamlit:
     name: Ping Streamlit App
     runs-on: ubuntu-latest
+    environment: 10k-finance-rag
     steps:
       - name: Wake up Streamlit app
         run: |
